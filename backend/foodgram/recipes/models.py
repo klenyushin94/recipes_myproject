@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth import get_user_model
 from django.core.validators import EmailValidator
 from django.db import models
 
@@ -32,10 +33,40 @@ class User(AbstractUser):
         blank=False,
         max_length=254,
     )
+    username = models.CharField(
+        verbose_name='Username',
+        help_text='Введите username',
+        unique=True,
+        blank=False,
+        max_length=150,
+        error_messages={
+            'unique': 'Пользователь с таким username уже создан!',
+        },
+    )
+    first_name = models.CharField(
+        verbose_name='Имя',
+        blank=False,
+        help_text='Введите имя',
+        max_length=150,
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        blank=False,
+        help_text='Введите фамилию',
+        max_length=150,
+    )
 
-    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = [
+        #'username',
+        'email',
+        'first_name',
+        'last_name',
+        'password',
+    ]
 
-    REQUIRED_FIELDS = []
+    # USERNAME_FIELD = 'email'
+
+    # REQUIRED_FIELDS = []
     # objects = UserCustomManager()
     class Meta:
         verbose_name = 'пользователь'
@@ -44,6 +75,9 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username} ({self.email})'
+
+
+#User = get_user_model()
 
 
 class Ingredients(models.Model):

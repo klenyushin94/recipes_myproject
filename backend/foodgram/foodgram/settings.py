@@ -125,7 +125,7 @@ STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -137,5 +137,4 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'recipes.User'
-LOGIN_FIELD = 'email'
-
+DJOSER = { 'LOGIN_FIELD': 'email', }
