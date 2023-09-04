@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'recipes.apps.RecipesConfig',
+    'api.apps.ApiConfig',
+    'users.apps.UsersConfig'
 ]
 
 MIDDLEWARE = [
@@ -136,5 +138,7 @@ REST_FRAMEWORK = {
 
 }
 
-AUTH_USER_MODEL = 'recipes.User'
-DJOSER = { 'LOGIN_FIELD': 'email', }
+AUTH_USER_MODEL = 'users.User'
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    }

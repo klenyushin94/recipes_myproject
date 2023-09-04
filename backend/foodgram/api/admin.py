@@ -1,9 +1,10 @@
 from django.contrib import admin
-
-from .models import (
-    Recipes, RecipeIngredient, Tag,
-    Ingredients, FavoriteRecipe, ShoppingCartRecipe, User
+from users.models import User
+from recipes.models import (
+    Recipes, RecipeIngredient, Tags,
+    Ingredients, FavoriteRecipe, ShoppingCartRecipe
 )
+
 
 
 @admin.register(User)
@@ -22,7 +23,7 @@ class IngredientsAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(Tag)
+@admin.register(Tags)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
         'name',
