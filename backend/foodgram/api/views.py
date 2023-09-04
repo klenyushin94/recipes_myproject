@@ -4,13 +4,20 @@ from rest_framework.pagination import PageNumberPagination
 from users.models import User
 from recipes.models import (
     Ingredients,
-    Tags, 
+    Tags,
     Recipes,
     RecipeIngredient,
-    FavoriteRecipe, 
+    FavoriteRecipe,
     ShoppingCartRecipe,
 )
-from .serializers import AchievementSerializer, CatSerializer
+from .serializers import (
+    IngredientsSerializer,
+    TagsSerializer,
+    RecipesSerializer,
+    RecipeIngredientSerializer,
+    FavoriteRecipeSerializer,
+    ShoppingCartRecipeSerializer
+)
 
 
 # class UserViewSet(viewsets.ModelViewSet):
@@ -31,8 +38,18 @@ class TagsViewSet(viewsets.ModelViewSet):
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     serializer_class = RecipesSerializer
-    
 
 
+class RecipeIngredientViewSet(viewsets.ModelViewSet):
+    queryset = RecipeIngredient.objects.all()
+    serializer_class = RecipeIngredientSerializer
 
 
+class FavoriteRecipeViewSet(viewsets.ModelViewSet):
+    queryset = FavoriteRecipe.objects.all()
+    serializer_class = FavoriteRecipeSerializer
+
+
+class ShoppingCartRecipeViewSet(viewsets.ModelViewSet):
+    queryset = ShoppingCartRecipe.objects.all()
+    serializer_class = ShoppingCartRecipeSerializer
