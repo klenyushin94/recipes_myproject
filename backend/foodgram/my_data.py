@@ -15,10 +15,10 @@ with open('ingredients.csv', 'r', encoding='utf8') as file:
     # Читаем данные из CSV файла и записываем их в базу данных
     for row in reader:
         name = row['name']
-        unit = row['unit']
+        measurement_unit = row['unit']
 
         # Вставляем данные в таблицу recipes_ingredients
-        cursor.execute("INSERT INTO recipes_ingredients (name, unit) VALUES (?, ?)", (name, unit))
+        cursor.execute("INSERT INTO recipes_ingredients (name, measurement_unit) VALUES (?, ?)", (name, measurement_unit))
 
 # Сохраняем изменения и закрываем соединение с базой данных
 conn.commit()

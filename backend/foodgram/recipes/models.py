@@ -4,7 +4,7 @@ from users.models import User
 
 class Ingredients(models.Model):
     name = models.CharField('Название ингредиента', max_length=50)
-    unit = models.CharField('Единицы измерения', max_length=20, unique=False)
+    measurement_unit = models.CharField('Единицы измерения', max_length=20, unique=False)
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -16,7 +16,7 @@ class Ingredients(models.Model):
 
 class Tags(models.Model):
     name = models.CharField('Название тега', max_length=50)
-    color_code = models.CharField('Цветовой код', max_length=7)
+    color = models.CharField('Цветовой код', max_length=7)
     slug = models.SlugField(unique=True)
 
     class Meta:
@@ -43,9 +43,13 @@ class Recipes(models.Model):
     ingredients = models.ManyToManyField(
         Ingredients,
         through='RecipeIngredient',
-        verbose_name='Ингредиенты'
+        verbose_name='Ингредиенты',
         )
-    tags = models.ManyToManyField(Tags, verbose_name='Теги')
+    tags = models.ManyToManyField(
+        Tags,
+        verbose_name='Теги',
+        related_name='recipes',
+    )
     cooking_time = models.IntegerField('Время приготовления блюда')
     pub_date = models.DateTimeField(auto_now_add=True)
 
@@ -59,15 +63,18 @@ class Recipes(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(
+        Recipes,
+        on_delete=models.CASCADE,
+        related_name='recipe_ingredient',
+    )
     ingredient = models.ForeignKey(
         Ingredients,
         on_delete=models.CASCADE,
+        related_name='recipe_ingredient',
     )
-    quantity = models.DecimalField(
+    amount = models.IntegerField(
         'Количество',
-        max_digits=5,
-        decimal_places=2
     )
 
     class Meta:

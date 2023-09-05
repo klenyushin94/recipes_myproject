@@ -19,7 +19,7 @@ class UserAdmin(admin.ModelAdmin):
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'unit',
+        'measurement_unit',
     )
 
 
@@ -27,7 +27,7 @@ class IngredientsAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'color_code',
+        'color',
         'slug',
     )
 
@@ -48,7 +48,7 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
     list_display = (
         'recipe',
         'ingredient',
-        'quantity',
+        'amount',
     )
 
 

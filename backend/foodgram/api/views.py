@@ -13,8 +13,7 @@ from recipes.models import (
 from .serializers import (
     IngredientsSerializer,
     TagsSerializer,
-    RecipesSerializer,
-    RecipeIngredientSerializer,
+    ResipesCreateUpdateSerializer,
     FavoriteRecipeSerializer,
     ShoppingCartRecipeSerializer
 )
@@ -28,6 +27,7 @@ from .serializers import (
 class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
+    pagination_class = PageNumberPagination
 
 
 class TagsViewSet(viewsets.ModelViewSet):
@@ -37,16 +37,10 @@ class TagsViewSet(viewsets.ModelViewSet):
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
-    serializer_class = RecipesSerializer
+    serializer_class = ResipesCreateUpdateSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-
-class RecipeIngredientViewSet(viewsets.ModelViewSet):
-    queryset = RecipeIngredient.objects.all()
-    serializer_class = RecipeIngredientSerializer
-    pagination_class = PageNumberPagination
 
 
 class FavoriteRecipeViewSet(viewsets.ModelViewSet):

@@ -6,7 +6,6 @@ from api.views import (
     IngredientsViewSet,
     TagsViewSet,
     RecipesViewSet,
-    RecipeIngredientViewSet,
     FavoriteRecipeViewSet,
     ShoppingCartRecipeViewSet,
 )
