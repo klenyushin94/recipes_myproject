@@ -39,9 +39,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     serializer_class = ResipesCreateUpdateSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
 
 class FavoriteRecipeViewSet(viewsets.ModelViewSet):
     queryset = FavoriteRecipe.objects.all()

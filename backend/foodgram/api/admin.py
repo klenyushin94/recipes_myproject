@@ -43,13 +43,13 @@ class RecipesAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(RecipeIngredient)
-class RecipeIngredientAdmin(admin.ModelAdmin):
-    list_display = (
-        'recipe',
-        'ingredient',
-        'amount',
-    )
+# @admin.register(RecipeIngredient)
+# class RecipeIngredientAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'recipe',
+#         'ingredient',
+#         'amount',
+#     )
 
 
 @admin.register(FavoriteRecipe)

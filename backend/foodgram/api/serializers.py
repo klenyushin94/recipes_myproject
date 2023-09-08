@@ -36,22 +36,17 @@ class TagsSerializer(serializers.ModelSerializer):
 
 
 class IngredientsM2MSerializer(serializers.ModelSerializer):
-    name = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredients.objects.all()
-    )
 
     class Meta:
         fields = (
             'id',
-            'name',
-            'amount',
+            'ingredient',
+            'ammount',
         )
         model = RecipeIngredient
 
 
 class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(slug_field='username', read_only=True)
-    tags = TagsSerializer(many=True)
     ingredients = IngredientsM2MSerializer(
         many=True,
         source='recipe_ingredient',
@@ -60,7 +55,6 @@ class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             'id',
-            'author',
             'name',
             'text',
             'ingredients',
@@ -72,59 +66,22 @@ class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
         tags = validated_data.pop('tags')
-        recipes = Recipes.objects.create(**validated_data)
-
+        author = self.context.get('request').user
+        recipes = Recipes.objects.create(author=author, **validated_data)
         for ingredient in ingredients:
             current_ingredient = ingredient.get('ingredient')
-            amount = ingredient.get('amount')
+            ammount = ingredient.get('ammount')
             recipes.ingredients.add(
                 current_ingredient,
                 through_defaults={
-                    'ammout': amount,
+                    'ammount': ammount,
                 }
             )
-      
+
         for tag in tags:
-            tag, status = Tags.objects.get_or_create(**tags)
             recipes.tags.add(tag)
 
         return recipes
-
-
-
-
-
-# class RecipesSerializer(serializers.ModelSerializer):
-#     author = SlugRelatedField(slug_field='username', read_only=True)
-#     tags = TagsSerializer(many=True)
-
-#     class Meta:
-#         fields = (
-#             'id',
-#             'author',
-#             'name',
-#             'text',
-#             'ingredients',
-#             'tags',
-#             'cooking_time',
-#         )
-#         model = Recipes
-
-#     def create(self, validated_data):
-#         tags = validated_data.pop('tags')
-#         recipes = Recipes.objects.create(**validated_data)
-
-#         for tag in tags:
-#             tag, status = Tags.objects.get_or_create(**tags)
-#             recipes.tags.add(tag)
-#         return recipes
-
-
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = '__all__'
-        model = FavoriteRecipe
 
 
 class FavoriteRecipeSerializer(serializers.ModelSerializer):
