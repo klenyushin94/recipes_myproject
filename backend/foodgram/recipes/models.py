@@ -3,6 +3,7 @@ from users.models import User
 
 
 class Ingredients(models.Model):
+    """Модель ингредиента."""
     name = models.CharField('Название ингредиента', max_length=50)
     measurement_unit = models.CharField('Единицы измерения', max_length=20, unique=False)
 
@@ -28,6 +29,7 @@ class Tags(models.Model):
 
 
 class Recipes(models.Model):
+    """Модель рецепта."""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -63,6 +65,7 @@ class Recipes(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """Промежуточная модель для связи рецептов и ингредиентов."""
     recipe = models.ForeignKey(
         Recipes,
         on_delete=models.CASCADE,
@@ -73,7 +76,7 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         related_name='recipe_ingredient',
     )
-    ammount = models.IntegerField(
+    amount = models.IntegerField(
         'Количество',
     )
 
@@ -86,6 +89,7 @@ class RecipeIngredient(models.Model):
 
 
 class FavoriteRecipe(models.Model):
+    """Модель для любимых блюд."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -108,6 +112,7 @@ class FavoriteRecipe(models.Model):
 
 
 class ShoppingCartRecipe(models.Model):
+    """Модель для списка покупок."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

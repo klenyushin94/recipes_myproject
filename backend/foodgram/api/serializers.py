@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
+from django.db.models import F
 
 from users.models import User
 from recipes.models import (
@@ -12,6 +12,19 @@ from recipes.models import (
 )
 
 
+class CustomUserSerialiser(serializers.ModelSerializer):
+
+    class Meta:
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+        )
+        model = User
+
+
 class IngredientsSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -21,6 +34,21 @@ class IngredientsSerializer(serializers.ModelSerializer):
             'measurement_unit',
         )
         model = Ingredients
+
+
+class ResipeIngredientsReadSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='ingredient.id')
+    name = serializers.CharField(source='ingredient.name')
+    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
+
+    class Meta:
+        model = RecipeIngredient
+        fields = (
+            'id',
+            'name',
+            'amount',
+            'measurement_unit',
+        )
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -39,9 +67,8 @@ class IngredientsM2MSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'id',
             'ingredient',
-            'ammount',
+            'amount',
         )
         model = RecipeIngredient
 
@@ -51,7 +78,8 @@ class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
         many=True,
         source='recipe_ingredient',
     )
-
+    print('>>>>>>>>>>>>>>>', ingredients)
+    
     class Meta:
         fields = (
             'id',
@@ -70,11 +98,11 @@ class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
         recipes = Recipes.objects.create(author=author, **validated_data)
         for ingredient in ingredients:
             current_ingredient = ingredient.get('ingredient')
-            ammount = ingredient.get('ammount')
+            ammount = ingredient.get('amount')
             recipes.ingredients.add(
                 current_ingredient,
                 through_defaults={
-                    'ammount': ammount,
+                    'amount': ammount,
                 }
             )
 
@@ -82,6 +110,24 @@ class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
             recipes.tags.add(tag)
 
         return recipes
+
+
+class ResipesReadSerializer(serializers.ModelSerializer):
+    tags = TagsSerializer(many=True)
+    author = CustomUserSerialiser(read_only=True)
+    ingredients = ResipeIngredientsReadSerializer(source='recipe_ingredient', many=True)
+
+    class Meta:
+        fields = (
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'name',
+            'text',
+            'cooking_time',
+        )
+        model = Recipes
 
 
 class FavoriteRecipeSerializer(serializers.ModelSerializer):

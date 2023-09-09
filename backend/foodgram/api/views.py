@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import SAFE_METHODS
 
 from users.models import User
 from recipes.models import (
@@ -15,13 +16,9 @@ from .serializers import (
     TagsSerializer,
     ResipesCreateUpdateSerializer,
     FavoriteRecipeSerializer,
-    ShoppingCartRecipeSerializer
+    ShoppingCartRecipeSerializer,
+    ResipesReadSerializer
 )
-
-
-# class UserViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
@@ -37,7 +34,12 @@ class TagsViewSet(viewsets.ModelViewSet):
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
-    serializer_class = ResipesCreateUpdateSerializer
+
+    def get_serializer_class(self):
+        # if self.request.method == SAFE_METHODS:
+        if self.request.method == 'GET':
+            return ResipesReadSerializer
+        return ResipesCreateUpdateSerializer
 
 
 class FavoriteRecipeViewSet(viewsets.ModelViewSet):
