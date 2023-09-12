@@ -7,14 +7,14 @@ from django.db import models
 class User(AbstractUser):
     """Модель кастомного пользователя."""
     email = models.EmailField(
-        verbose_name='E-mail',
+        verbose_name='Электронная почта',
         help_text='Введите e-mail',
         unique=True,
         blank=False,
         max_length=254,
     )
     username = models.CharField(
-        verbose_name='Username',
+        verbose_name='Логин',
         help_text='Введите username',
         unique=True,
         blank=False,
@@ -34,6 +34,10 @@ class User(AbstractUser):
         blank=False,
         help_text='Введите фамилию',
         max_length=150,
+    )
+    is_subscribed = models.BooleanField(
+        verbose_name='Подписка',
+        default=False,
     )
 
     REQUIRED_FIELDS = [

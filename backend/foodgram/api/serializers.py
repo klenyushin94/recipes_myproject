@@ -9,6 +9,7 @@ from recipes.models import (
     RecipeIngredient,
     FavoriteRecipe,
     ShoppingCartRecipe,
+    Subscriptions
 )
 
 
@@ -21,6 +22,8 @@ class CustomUserSerialiser(serializers.ModelSerializer):
             'username',
             'first_name',
             'last_name',
+            'password',
+            'is_subscribed',
         )
         model = User
 
@@ -78,8 +81,7 @@ class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
         many=True,
         source='recipe_ingredient',
     )
-    print('>>>>>>>>>>>>>>>', ingredients)
-    
+
     class Meta:
         fields = (
             'id',
@@ -142,3 +144,17 @@ class ShoppingCartRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = ShoppingCartRecipe
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Subscriptions
+
+
+class SubscriptionsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Subscriptions
