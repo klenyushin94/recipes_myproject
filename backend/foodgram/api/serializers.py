@@ -14,6 +14,7 @@ from recipes.models import (
 
 
 class CustomUserSerialiser(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         fields = (
@@ -26,6 +27,15 @@ class CustomUserSerialiser(serializers.ModelSerializer):
             'is_subscribed',
         )
         model = User
+
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        author = obj
+        is_subscribed = Subscriptions.objects.filter(
+            user=user,
+            author=author
+        ).exists()
+        return is_subscribed
 
 
 class IngredientsSerializer(serializers.ModelSerializer):
