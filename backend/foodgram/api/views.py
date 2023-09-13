@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 
 from users.models import User
 
+from djoser.views import UserViewSet
+
 from recipes.models import (
     User,
     Ingredients,
@@ -24,17 +26,22 @@ from .serializers import (
     ResipesReadSerializer,
     SubscribeSerializer,
     SubscriptionsSerializer,
-    CustomUserSerialiser
+    CustomUserSerializer,
+    CustomUserCreateSerializer,
 )
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(UserViewSet):
     queryset = User.objects.all()
-    serializer_class = CustomUserSerialiser
     pagination_class = PageNumberPagination
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CustomUserSerializer
+        return CustomUserCreateSerializer
+
     @action(detail=True, methods=['post', 'delete'])
-    def subscribe(self, request, pk=None):
+    def subscribe(self, request, id=None):
         author = self.get_object()
         if request.method == 'POST':
             author = get_object_or_404(User, username=author.username)

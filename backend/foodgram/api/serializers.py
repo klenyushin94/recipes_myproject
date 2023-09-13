@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.db.models import F
+from djoser.serializers import UserCreateSerializer, UserSerializer
 
 from users.models import User
 from recipes.models import (
@@ -13,7 +13,7 @@ from recipes.models import (
 )
 
 
-class CustomUserSerialiser(serializers.ModelSerializer):
+class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -23,7 +23,6 @@ class CustomUserSerialiser(serializers.ModelSerializer):
             'username',
             'first_name',
             'last_name',
-            'password',
             'is_subscribed',
         )
         model = User
@@ -36,6 +35,20 @@ class CustomUserSerialiser(serializers.ModelSerializer):
             author=author
         ).exists()
         return is_subscribed
+
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+
+    class Meta:
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'password',
+        )
+        model = User
 
 
 class IngredientsSerializer(serializers.ModelSerializer):
@@ -126,7 +139,7 @@ class ResipesCreateUpdateSerializer(serializers.ModelSerializer):
 
 class ResipesReadSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(many=True)
-    author = CustomUserSerialiser(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     ingredients = ResipeIngredientsReadSerializer(source='recipe_ingredient', many=True)
 
     class Meta:
