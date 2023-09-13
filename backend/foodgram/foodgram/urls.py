@@ -14,10 +14,10 @@ from api.views import (
 )
 
 router1 = routers.DefaultRouter()
-router1.register(r'tags', TagsViewSet)
-router1.register(r'recipes', RecipesViewSet)
-router1.register(r'ingredients', IngredientsViewSet)
-router1.register(r'users', UserViewSet)
+router1.register(r'tags', TagsViewSet, basename='tags')
+router1.register(r'recipes', RecipesViewSet, basename='recipes')
+router1.register(r'ingredients', IngredientsViewSet, basename='ingredients')
+router1.register(r'users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

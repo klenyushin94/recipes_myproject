@@ -176,8 +176,59 @@ class SubscribeSerializer(serializers.ModelSerializer):
         model = Subscriptions
 
 
-class SubscriptionsSerializer(serializers.ModelSerializer):
+class ResipesShortSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField
+    name = serializers.CharField
+    cooking_time = serializers.IntegerField
 
     class Meta:
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'cooking_time',
+        )
+        model = Recipes
+
+
+class SubscriptionsSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='author.email')
+    id = serializers.IntegerField(source='author.id')
+    username = serializers.CharField(source='author.username')
+    first_name = serializers.CharField(source='author.first_name')
+    last_name = serializers.CharField(source='author.last_name')
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+        )
         model = Subscriptions
+
+    def get_is_subscribed(self, obj):
+        user = obj.user
+        author = obj.author
+        is_subscribed = Subscriptions.objects.filter(
+            user=user,
+            author=author
+            ).exists()
+        return is_subscribed
+
+    def get_recipes(self, obj):
+        author = obj.author
+        recipes = Recipes.objects.filter(author=author)
+        serializer = ResipesShortSerializer(recipes, many=True)
+        return serializer.data
+
+    def get_recipes_count(self, obj):
+        author = obj.author
+        recipes_count = Recipes.objects.filter(author=author).count()
+        return recipes_count

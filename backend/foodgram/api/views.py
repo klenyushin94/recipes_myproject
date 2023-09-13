@@ -89,6 +89,14 @@ class SubscriptionsViewSet(viewsets.ViewSet):
     queryset = Subscriptions.objects.all()
     serializer_class = SubscriptionsSerializer
 
+    # def list(self, request):
+    #     serializer = self.serializer_class(
+    #         self.queryset,
+    #         many=True,
+    #         context={'request': request}
+    #     )
+    #     return Response(serializer.data)
+
     # def perform_create(self, serializer):
     #     serializer.save(user=self.request.user)
 
