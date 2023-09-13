@@ -45,18 +45,19 @@ class UserViewSet(UserViewSet):
         author = self.get_object()
         if request.method == 'POST':
             author = get_object_or_404(User, username=author.username)
-            Subscriptions.objects.get_or_create(
+            subscriptions, created = Subscriptions.objects.get_or_create(
                 user=request.user,
                 author=author,
             )
-            return Response({'message': 'Подписка создана'})
+            serializer = SubscriptionsSerializer(subscriptions)
+            return Response(serializer.data)
         elif request.method == 'DELETE':
             author = get_object_or_404(User, username=author.username)
             Subscriptions.objects.filter(
                 user_id=request.user.id,
                 author_id=author.pk,
             ).delete()
-            return Response({'message': 'Подписка удалена'})
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'])
     def subscriptions(self, request):
@@ -83,36 +84,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             return ResipesReadSerializer
         return ResipesCreateUpdateSerializer
-
-
-class SubscriptionsViewSet(viewsets.ViewSet):
-    queryset = Subscriptions.objects.all()
-    serializer_class = SubscriptionsSerializer
-
-    # def list(self, request):
-    #     serializer = self.serializer_class(
-    #         self.queryset,
-    #         many=True,
-    #         context={'request': request}
-    #     )
-    #     return Response(serializer.data)
-
-    # def perform_create(self, serializer):
-    #     serializer.save(user=self.request.user)
-
-    # def get_queryset(self):
-    #     return self.request.user.follower.all()
-
-    # def destroy(self, request, id=None):
-    #     # Логика отписки пользователя
-    #     user_id = id
-    #     # Ваш код для обработки отписки пользователя
-    #     return Response({'message': f'User {user_id} has been unsubscribed'})
-
-
-class SubscribeViewSet(viewsets.ViewSet):
-    queryset = Subscriptions.objects.all()
-    serializer_class = SubscribeSerializer
 
 
 class FavoriteRecipeViewSet(viewsets.ModelViewSet):

@@ -9,9 +9,7 @@ from api.views import (
     RecipesViewSet,
     FavoriteRecipeViewSet,
     ShoppingCartRecipeViewSet,
-    SubscriptionsViewSet,
-    SubscribeViewSet,
-)
+    )
 
 router1 = routers.DefaultRouter()
 router1.register(r'tags', TagsViewSet, basename='tags')
