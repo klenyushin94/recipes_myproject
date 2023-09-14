@@ -141,6 +141,7 @@ class ResipesReadSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = ResipeIngredientsReadSerializer(source='recipe_ingredient', many=True)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         fields = (
@@ -151,15 +152,18 @@ class ResipesReadSerializer(serializers.ModelSerializer):
             'name',
             'text',
             'cooking_time',
+            'is_favorited',
         )
         model = Recipes
 
-
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = '__all__'
-        model = FavoriteRecipe
+    def get_is_favorited(self, obj):
+        user = self.context['request'].user
+        recipe = obj.id
+        is_favorited = FavoriteRecipe.objects.filter(
+            user=user,
+            recipe=recipe
+            ).exists()
+        return is_favorited
 
 
 class ShoppingCartRecipeSerializer(serializers.ModelSerializer):
@@ -232,6 +236,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             author=author
             ).exists()
         return is_subscribed
+    
 
     def get_recipes(self, obj):
         author = obj.author
