@@ -40,7 +40,12 @@ class Recipes(models.Model):
         'Название блюда',
         max_length=50,
     )
-    # image = models.ImageField('Картинка', upload_to='posts/', blank=True)
+    image = models.ImageField(
+        'Картинка',
+        upload_to='recipes/images/',
+        null=True,
+        default=None
+        )
     text = models.TextField('Текст описания блюда')
     ingredients = models.ManyToManyField(
         Ingredients,

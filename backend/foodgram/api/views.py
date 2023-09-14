@@ -18,13 +18,13 @@ from recipes.models import (
 from .serializers import (
     IngredientsSerializer,
     TagsSerializer,
-    ResipesCreateUpdateSerializer,
+    RecipesCreateUpdateSerializer,
     ShoppingCartRecipeSerializer,
-    ResipesReadSerializer,
+    RecipesReadSerializer,
     SubscriptionsSerializer,
     CustomUserSerializer,
     CustomUserCreateSerializer,
-    ResipesFavoriteShortSerializer,
+    RecipesFavoriteShortSerializer,
 )
 
 
@@ -79,8 +79,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return ResipesReadSerializer
-        return ResipesCreateUpdateSerializer
+            return RecipesReadSerializer
+        return RecipesCreateUpdateSerializer
 
     @action(detail=True, methods=['post', 'delete'])
     def favorite(self, request, pk=None):
@@ -98,7 +98,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
                     user=request.user,
                     recipe=recipe,
                     )
-                serializer = ResipesFavoriteShortSerializer(favorite)
+                serializer = RecipesFavoriteShortSerializer(favorite)
                 return Response(serializer.data)
         elif request.method == 'DELETE':
             recipe = get_object_or_404(Recipes, pk=pk)
