@@ -54,6 +54,14 @@ class Recipes(models.Model):
     )
     cooking_time = models.IntegerField('Время приготовления блюда')
     pub_date = models.DateTimeField(auto_now_add=True)
+    is_favorited = models.BooleanField(
+        verbose_name='Избранное',
+        default=False,
+    )
+    is_in_shopping_cart = models.BooleanField(
+        verbose_name='Список продуктов',
+        default=False,
+    )
 
     class Meta:
         ordering = ('-pub_date', )

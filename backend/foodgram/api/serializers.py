@@ -176,10 +176,21 @@ class SubscribeSerializer(serializers.ModelSerializer):
         model = Subscriptions
 
 
+class ResipesFavoriteShortSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='recipe.id')
+    name = serializers.CharField(source='recipe.name')
+    cooking_time = serializers.IntegerField(source='recipe.cooking_time')
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'cooking_time',
+        )
+        model = FavoriteRecipe
+
+
 class ResipesShortSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField
-    name = serializers.CharField
-    cooking_time = serializers.IntegerField
 
     class Meta:
         fields = (

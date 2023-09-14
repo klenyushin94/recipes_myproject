@@ -4,8 +4,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
-from users.models import User
-
 from djoser.views import UserViewSet
 
 from recipes.models import (
@@ -16,18 +14,17 @@ from recipes.models import (
     FavoriteRecipe,
     ShoppingCartRecipe,
     Subscriptions,
-)
+    )
 from .serializers import (
     IngredientsSerializer,
     TagsSerializer,
     ResipesCreateUpdateSerializer,
-    FavoriteRecipeSerializer,
     ShoppingCartRecipeSerializer,
     ResipesReadSerializer,
-    SubscribeSerializer,
     SubscriptionsSerializer,
     CustomUserSerializer,
     CustomUserCreateSerializer,
+    ResipesFavoriteShortSerializer,
 )
 
 
@@ -85,10 +82,35 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return ResipesReadSerializer
         return ResipesCreateUpdateSerializer
 
-
-class FavoriteRecipeViewSet(viewsets.ModelViewSet):
-    queryset = FavoriteRecipe.objects.all()
-    serializer_class = FavoriteRecipeSerializer
+    @action(detail=True, methods=['post', 'delete'])
+    def favorite(self, request, pk=None):
+        recipe = self.get_object()
+        if request.method == 'POST':
+            recipe = get_object_or_404(Recipes, pk=pk)
+            favorites = FavoriteRecipe.objects.filter(
+                user=request.user,
+                recipe=recipe,
+            )
+            if favorites.exists():
+                return Response({'message': 'Рецепт уже добавлен в избранное'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                favorite = FavoriteRecipe.objects.create(
+                    user=request.user,
+                    recipe=recipe,
+                    )
+                serializer = ResipesFavoriteShortSerializer(favorite)
+                return Response(serializer.data)
+        elif request.method == 'DELETE':
+            recipe = get_object_or_404(Recipes, pk=pk)
+            favorites = FavoriteRecipe.objects.filter(
+                user=request.user,
+                recipe=recipe,
+                )
+            if favorites.exists():
+                favorites.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({'message': 'Рецепт не найден в избранном'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class ShoppingCartRecipeViewSet(viewsets.ModelViewSet):
