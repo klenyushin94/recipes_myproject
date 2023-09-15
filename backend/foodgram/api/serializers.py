@@ -19,8 +19,8 @@ from recipes.models import (
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')  
-            ext = format.split('/')[-1]  
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
         return super().to_internal_value(data)
@@ -111,6 +111,11 @@ class IngredientsM2MSerializer(serializers.ModelSerializer):
         )
         model = RecipeIngredient
 
+    # def to_representation(self, instance): #вставил твой код
+    #     data = super().to_representation(instance)
+    #     data['ingredient'] = IngredientsSerializer(instance.ingredient).data
+    #     return data
+
 
 class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
     ingredients = IngredientsM2MSerializer(
@@ -151,6 +156,25 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
 
         return recipes
 
+    def update(self, instance, validated_data):
+        ingredients_data = validated_data.pop('recipe_ingredient', [])
+        tags_data = validated_data.pop('tags', [])
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.image = validated_data.get('image', instance.image)
+        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        instance.ingredients.clear()
+        for ingredient_data in ingredients_data:
+            ingredient = ingredient_data['ingredient']
+            amount = ingredient_data['amount']
+            RecipeIngredient.objects.create(recipe=instance, ingredient=ingredient, amount=amount)
+        instance.tags.clear()
+        for tag_data in tags_data:
+            tag = tag_data
+            instance.tags.add(tag)
+        instance.save()
+        return instance
+
 
 class RecipesReadSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(many=True)
@@ -183,32 +207,36 @@ class RecipesReadSerializer(serializers.ModelSerializer):
         return is_favorited
 
 
-class ShoppingCartRecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = '__all__'
-        model = ShoppingCartRecipe
-
-
-class SubscribeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = '__all__'
-        model = Subscriptions
-
-
 class RecipesFavoriteShortSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='recipe.id')
     name = serializers.CharField(source='recipe.name')
+    image = Base64ImageField(source='recipe.image', required=False, allow_null=True)
     cooking_time = serializers.IntegerField(source='recipe.cooking_time')
 
     class Meta:
         fields = (
             'id',
             'name',
+            'image',
             'cooking_time',
         )
         model = FavoriteRecipe
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='recipe.id')
+    name = serializers.CharField(source='recipe.name')
+    image = Base64ImageField(source='recipe.image', required=False, allow_null=True)
+    cooking_time = serializers.IntegerField(source='recipe.cooking_time')
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        )
+        model = ShoppingCartRecipe
 
 
 class RecipesShortSerializer(serializers.ModelSerializer):
@@ -218,6 +246,7 @@ class RecipesShortSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'cooking_time',
+            'image',
         )
         model = Recipes
 

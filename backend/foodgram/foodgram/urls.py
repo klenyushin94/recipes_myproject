@@ -9,7 +9,6 @@ from api.views import (
     IngredientsViewSet,
     TagsViewSet,
     RecipesViewSet,
-    ShoppingCartRecipeViewSet,
     )
 
 router1 = routers.DefaultRouter()
