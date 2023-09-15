@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
+from django.utils.translation import ugettext as _
 from collections import defaultdict
+from reportlab.pdfbase import pdfmetrics, ttfonts
 
 from djoser.views import UserViewSet
 
@@ -31,6 +33,12 @@ from .serializers import (
     RecipesFavoriteShortSerializer,
     ShoppingCartSerializer
 )
+
+
+class SubscriptionsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 
 class UserViewSet(UserViewSet):
@@ -63,8 +71,10 @@ class UserViewSet(UserViewSet):
     @action(detail=False, methods=['get'])
     def subscriptions(self, request):
         subscriptions = Subscriptions.objects.filter(user=request.user)
-        serializer = SubscriptionsSerializer(subscriptions, many=True)
-        return Response(serializer.data)
+        paginator = SubscriptionsPagination()
+        result_page = paginator.paginate_queryset(subscriptions, request)
+        serializer = SubscriptionsSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
@@ -166,14 +176,19 @@ class RecipesViewSet(viewsets.ModelViewSet):
             for recipe_ingredient in recipe_ingredients:
                 ingredient = recipe_ingredient.ingredient
                 ingredients_totals[ingredient.name] += recipe_ingredient.amount
+        MyFontObject = ttfonts.TTFont('Arial', './media/arial.ttf')
+        pdfmetrics.registerFont(MyFontObject)
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="shopping_cart.pdf"'
         p = canvas.Canvas(response)
-        p.setFont("Helvetica", 12)
-        y = 100
+        p.setFont("Arial", 12)
+        p.setFont("Arial", 14)  # Жирный шрифт для заголовка
+        p.drawString(100, 800, _("Cписок продуктов"))  # Заголовок
+        p.setFont("Arial", 12)  # Возвращаем обычный шрифт
+        y = 750
         for ingredient, amount in ingredients_totals.items():
             p.drawString(100, y, f"{ingredient} ({ingredient}) - {amount}")
-            y += 20
+            y -= 20
         p.showPage()
         p.save()
         return response
