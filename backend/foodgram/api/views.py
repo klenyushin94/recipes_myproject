@@ -8,6 +8,10 @@ from reportlab.pdfgen import canvas
 from django.utils.translation import ugettext as _
 from collections import defaultdict
 from reportlab.pdfbase import pdfmetrics, ttfonts
+from rest_framework import permissions
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
+from rest_framework.pagination import LimitOffsetPagination
 
 from djoser.views import UserViewSet
 
@@ -34,16 +38,21 @@ from .serializers import (
     ShoppingCartSerializer
 )
 
+from .permissions import IsAdminUserOrReadOnly
+
+
+class UserPagination(PageNumberPagination):
+    page_size_query_param = 'limit'
+
 
 class SubscriptionsPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
+    page_size_query_param = 'limit'
     max_page_size = 100
 
 
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
-    pagination_class = PageNumberPagination
+    pagination_class = UserPagination
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -74,22 +83,43 @@ class UserViewSet(UserViewSet):
         paginator = SubscriptionsPagination()
         result_page = paginator.paginate_queryset(subscriptions, request)
         serializer = SubscriptionsSerializer(result_page, many=True)
+        recipes_limit = request.GET.get('recipes_limit', None)
+        if recipes_limit:
+            for subscription in serializer.data:
+                subscription['recipes'] = subscription['recipes'][:int(recipes_limit)]
         return paginator.get_paginated_response(serializer.data)
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
+    pagination_class = None
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
-    pagination_class = PageNumberPagination
 
 
 class TagsViewSet(viewsets.ModelViewSet):
+    pagination_class = None
     queryset = Tags.objects.all()
+    permission_classes = (IsAdminUserOrReadOnly, )
     serializer_class = TagsSerializer
+
+
+class RecipesFilter(filters.FilterSet):
+    tags = filters.CharFilter(field_name='tags__slug', lookup_expr='in')
+
+    class Meta:
+        model = Recipes
+        fields = {
+            'is_favorited': ['exact'],
+            'is_in_shopping_cart': ['exact'],
+            'author': ['exact'],
+        }
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
+    pagination_class = LimitOffsetPagination
+    # filter_backends = (DjangoFilterBackend,)
+    # filterset_fields = RecipesFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -175,6 +205,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             recipe_ingredients = RecipeIngredient.objects.filter(recipe=cart_item.recipe)
             for recipe_ingredient in recipe_ingredients:
                 ingredient = recipe_ingredient.ingredient
+                measurement_unit = Ingredients.objects.get(name=ingredient).measurement_unit
                 ingredients_totals[ingredient.name] += recipe_ingredient.amount
         MyFontObject = ttfonts.TTFont('Arial', './media/arial.ttf')
         pdfmetrics.registerFont(MyFontObject)
@@ -187,7 +218,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         p.setFont("Arial", 12)  # Возвращаем обычный шрифт
         y = 750
         for ingredient, amount in ingredients_totals.items():
-            p.drawString(100, y, f"{ingredient} ({ingredient}) - {amount}")
+            p.drawString(100, y, f"{ingredient} ({measurement_unit}) - {amount}")
             y -= 20
         p.showPage()
         p.save()

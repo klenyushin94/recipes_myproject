@@ -152,7 +152,7 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
         return recipes
 
     def update(self, instance, validated_data):
-        ingredients_data = validated_data.pop('recipe_ingredient', [])
+        ingredients_data = validated_data.pop('ingredients', [])
         tags_data = validated_data.pop('tags', [])
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
@@ -160,11 +160,13 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
         instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
         instance.ingredients.clear()
         for ingredient_data in ingredients_data:
-            ingredient = ingredient_data['ingredient']
+            ingredient = ingredient_data['id']
             amount = ingredient_data['amount']
             RecipeIngredient.objects.create(
                 recipe=instance,
-                ingredient=ingredient, amount=amount)
+                ingredient=ingredient,
+                amount=amount
+                )
         instance.tags.clear()
         for tag_data in tags_data:
             tag = tag_data
