@@ -59,14 +59,6 @@ class Recipes(models.Model):
     )
     cooking_time = models.IntegerField('Время приготовления блюда')
     pub_date = models.DateTimeField(auto_now_add=True)
-    is_favorited = models.BooleanField(
-        verbose_name='Избранное',
-        default=False,
-    )
-    is_in_shopping_cart = models.BooleanField(
-        verbose_name='Список продуктов',
-        default=False,
-    )
 
     class Meta:
         ordering = ('-pub_date', )
@@ -112,7 +104,7 @@ class FavoriteRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipes,
         on_delete=models.CASCADE,
-        related_name='favorited_by',
+        related_name='favorite_recipes',
         verbose_name='Рецепт'
         )
 

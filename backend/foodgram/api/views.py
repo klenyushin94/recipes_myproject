@@ -41,8 +41,25 @@ from .serializers import (
 from .permissions import IsAdminUserOrReadOnly
 
 
+class RecipeFilter(filters.FilterSet):
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tags.objects.all(),
+    )
+    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
+
+    def filter_is_favorited(self, queryset, name, value):
+        user = self.request.user
+        if value and not user.is_anonymous:
+            return queryset.filter(favorite_recipes__user=user)
+        return queryset
+
+
 class UserPagination(PageNumberPagination):
+    page_size = 6
     page_size_query_param = 'limit'
+    max_page_size = 100
 
 
 class SubscriptionsPagination(PageNumberPagination):
@@ -103,23 +120,11 @@ class TagsViewSet(viewsets.ModelViewSet):
     serializer_class = TagsSerializer
 
 
-class RecipesFilter(filters.FilterSet):
-    tags = filters.CharFilter(field_name='tags__slug', lookup_expr='in')
-
-    class Meta:
-        model = Recipes
-        fields = {
-            'is_favorited': ['exact'],
-            'is_in_shopping_cart': ['exact'],
-            'author': ['exact'],
-        }
-
-
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
-    pagination_class = LimitOffsetPagination
-    # filter_backends = (DjangoFilterBackend,)
-    # filterset_fields = RecipesFilter
+    pagination_class = UserPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -205,7 +210,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             recipe_ingredients = RecipeIngredient.objects.filter(recipe=cart_item.recipe)
             for recipe_ingredient in recipe_ingredients:
                 ingredient = recipe_ingredient.ingredient
-                measurement_unit = Ingredients.objects.get(name=ingredient).measurement_unit
+                # measurement_unit = Ingredients.objects.get(name=ingredient).measurement_unit
                 ingredients_totals[ingredient.name] += recipe_ingredient.amount
         MyFontObject = ttfonts.TTFont('Arial', './media/arial.ttf')
         pdfmetrics.registerFont(MyFontObject)
@@ -218,6 +223,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         p.setFont("Arial", 12)  # Возвращаем обычный шрифт
         y = 750
         for ingredient, amount in ingredients_totals.items():
+            measurement_unit = Ingredients.objects.get(name=ingredient).measurement_unit
             p.drawString(100, y, f"{ingredient} ({measurement_unit}) - {amount}")
             y -= 20
         p.showPage()
