@@ -35,7 +35,8 @@ from .serializers import (
     CustomUserSerializer,
     CustomUserCreateSerializer,
     RecipesFavoriteShortSerializer,
-    ShoppingCartSerializer
+    ShoppingCartSerializer,
+    SetPasswordSerializer
 )
 
 from .permissions import IsAdminUserOrReadOnly
@@ -48,12 +49,17 @@ class RecipeFilter(filters.FilterSet):
         queryset=Tags.objects.all(),
     )
     is_favorited = filters.BooleanFilter(method='filter_is_favorited')
+    author = filters.NumberFilter(field_name='author__id')
 
     def filter_is_favorited(self, queryset, name, value):
         user = self.request.user
         if value and not user.is_anonymous:
             return queryset.filter(favorite_recipes__user=user)
         return queryset
+
+    class Meta:
+        model = Recipes
+        fields = ['author', 'tags', 'is_favorited']
 
 
 class UserPagination(PageNumberPagination):
@@ -79,7 +85,7 @@ class UserViewSet(UserViewSet):
     @action(detail=True, methods=['post', 'delete'])
     def subscribe(self, request, id=None):
         if request.method == 'POST':
-            author = get_object_or_404(User, username=author.username)
+            author = get_object_or_404(User, id=id)
             subscriptions, created = Subscriptions.objects.get_or_create(
                 user=request.user,
                 author=author,
@@ -87,7 +93,7 @@ class UserViewSet(UserViewSet):
             serializer = SubscriptionsSerializer(subscriptions)
             return Response(serializer.data)
         elif request.method == 'DELETE':
-            author = get_object_or_404(User, username=author.username)
+            author = get_object_or_404(User, id=id)
             Subscriptions.objects.filter(
                 user_id=request.user.id,
                 author_id=author.pk,
@@ -105,6 +111,19 @@ class UserViewSet(UserViewSet):
             for subscription in serializer.data:
                 subscription['recipes'] = subscription['recipes'][:int(recipes_limit)]
         return paginator.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def set_password(self, request):
+        serializer = SetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        current_password = serializer.validated_data['current_password']
+        new_password = serializer.validated_data['new_password']
+        if not user.check_password(current_password):
+            return Response({'error': 'Invalid current password.'}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password successfully changed.'}, status=status.HTTP_200_OK)
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):

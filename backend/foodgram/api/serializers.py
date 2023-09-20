@@ -26,6 +26,11 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
+class SetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True)
+    current_password = serializers.CharField(required=True)
+
+
 class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
