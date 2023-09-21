@@ -1,4 +1,5 @@
 import base64
+import re
 
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
@@ -137,6 +138,8 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
+        if not ingredients:
+            raise serializers.ValidationError("Ingredients field cannot be empty.")
         tags = validated_data.pop('tags')
         author = self.context.get('request').user
         recipes = Recipes.objects.create(author=author, **validated_data)

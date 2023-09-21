@@ -1,3 +1,4 @@
+import re
 from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
@@ -11,8 +12,7 @@ from reportlab.pdfbase import pdfmetrics, ttfonts
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
-from rest_framework.pagination import LimitOffsetPagination
-
+from rest_framework.exceptions import ValidationError
 from djoser.views import UserViewSet
 
 from recipes.models import (
@@ -39,7 +39,7 @@ from .serializers import (
     SetPasswordSerializer
 )
 
-from .permissions import IsAdminUserOrReadOnly
+from .permissions import CustomReadOnly
 
 
 class RecipeFilter(filters.FilterSet):
@@ -76,6 +76,12 @@ class SubscriptionsPagination(PageNumberPagination):
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     pagination_class = UserPagination
+
+    def create(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        if re.match(r'^[A-Za-z0-9]+$', username):
+            return super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -131,12 +137,36 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
 
+    def create(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class TagsViewSet(viewsets.ModelViewSet):
     pagination_class = None
     queryset = Tags.objects.all()
-    permission_classes = (IsAdminUserOrReadOnly, )
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     serializer_class = TagsSerializer
+
+    def create(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
