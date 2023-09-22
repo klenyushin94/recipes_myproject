@@ -1,45 +1,29 @@
 import re
-from rest_framework import viewsets, status
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-from django.utils.translation import ugettext as _
 from collections import defaultdict
-from reportlab.pdfbase import pdfmetrics, ttfonts
-from rest_framework import permissions
-from django_filters.rest_framework import DjangoFilterBackend
+
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext as _
 from django_filters import rest_framework as filters
-from rest_framework.exceptions import ValidationError
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from reportlab.pdfbase import pdfmetrics, ttfonts
+from reportlab.pdfgen import canvas
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
-from recipes.models import (
-    User,
-    Ingredients,
-    Tags,
-    Recipes,
-    FavoriteRecipe,
-    ShoppingCartRecipe,
-    Subscriptions,
-    RecipeIngredient,
-    )
+from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
+                            Recipes, ShoppingCartRecipe, Subscriptions, Tags,
+                            User)
 
-from .serializers import (
-    IngredientsSerializer,
-    TagsSerializer,
-    RecipesCreateUpdateSerializer,
-    RecipesReadSerializer,
-    SubscriptionsSerializer,
-    CustomUserSerializer,
-    CustomUserCreateSerializer,
-    RecipesFavoriteShortSerializer,
-    ShoppingCartSerializer,
-    SetPasswordSerializer
-)
-
-from .permissions import CustomReadOnly
+from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
+                          IngredientsSerializer, RecipesCreateUpdateSerializer,
+                          RecipesFavoriteShortSerializer,
+                          RecipesReadSerializer, SetPasswordSerializer,
+                          ShoppingCartSerializer, SubscriptionsSerializer,
+                          TagsSerializer)
 
 
 class RecipeFilter(filters.FilterSet):
@@ -115,7 +99,9 @@ class UserViewSet(UserViewSet):
         recipes_limit = request.GET.get('recipes_limit', None)
         if recipes_limit:
             for subscription in serializer.data:
-                subscription['recipes'] = subscription['recipes'][:int(recipes_limit)]
+                subscription['recipes'] = (
+                    subscription['recipes'][:int(recipes_limit)]
+                    )
         return paginator.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['post'])
@@ -126,10 +112,16 @@ class UserViewSet(UserViewSet):
         current_password = serializer.validated_data['current_password']
         new_password = serializer.validated_data['new_password']
         if not user.check_password(current_password):
-            return Response({'error': 'Invalid current password.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Invalid current password.'},
+                status=status.HTTP_400_BAD_REQUEST,
+                )
         user.set_password(new_password)
         user.save()
-        return Response({'message': 'Password successfully changed.'}, status=status.HTTP_200_OK)
+        return Response(
+            {'message': 'Password successfully changed.'},
+            status=status.HTTP_200_OK
+            )
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
@@ -256,24 +248,32 @@ class RecipesViewSet(viewsets.ModelViewSet):
         cart_items = ShoppingCartRecipe.objects.filter(user=user)
         ingredients_totals = defaultdict(int)
         for cart_item in cart_items:
-            recipe_ingredients = RecipeIngredient.objects.filter(recipe=cart_item.recipe)
+            recipe_ingredients = RecipeIngredient.objects.filter(
+                recipe=cart_item.recipe,
+                )
             for recipe_ingredient in recipe_ingredients:
                 ingredient = recipe_ingredient.ingredient
-                # measurement_unit = Ingredients.objects.get(name=ingredient).measurement_unit
                 ingredients_totals[ingredient.name] += recipe_ingredient.amount
         MyFontObject = ttfonts.TTFont('Arial', './media/arial.ttf')
         pdfmetrics.registerFont(MyFontObject)
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="shopping_cart.pdf"'
+        response['Content-Disposition'] = (
+            'attachment; '
+            'filename="shopping_cart.pdf"'
+            )
         p = canvas.Canvas(response)
         p.setFont("Arial", 12)
-        p.setFont("Arial", 14)  # Жирный шрифт для заголовка
-        p.drawString(100, 800, _("Cписок продуктов"))  # Заголовок
-        p.setFont("Arial", 12)  # Возвращаем обычный шрифт
+        p.setFont("Arial", 14)
+        p.drawString(100, 800, _("Cписок продуктов"))
+        p.setFont("Arial", 12)
         y = 750
         for ingredient, amount in ingredients_totals.items():
-            measurement_unit = Ingredients.objects.get(name=ingredient).measurement_unit
-            p.drawString(100, y, f"{ingredient} ({measurement_unit}) - {amount}")
+            measurement_unit = Ingredients.objects.get(name=ingredient)
+            measurement_unit = measurement_unit.measurement_unit
+            p.drawString(
+                100,
+                y,
+                f"{ingredient} ({measurement_unit}) - {amount}")
             y -= 20
         p.showPage()
         p.save()

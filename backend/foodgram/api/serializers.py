@@ -1,20 +1,12 @@
 import base64
-import re
 
-from rest_framework import serializers
-from djoser.serializers import UserCreateSerializer, UserSerializer
 from django.core.files.base import ContentFile
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from rest_framework import serializers
 
+from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
+                            Recipes, ShoppingCartRecipe, Subscriptions, Tags)
 from users.models import User
-from recipes.models import (
-    Ingredients,
-    Tags,
-    Recipes,
-    RecipeIngredient,
-    FavoriteRecipe,
-    ShoppingCartRecipe,
-    Subscriptions
-)
 
 
 class Base64ImageField(serializers.ImageField):
@@ -84,7 +76,9 @@ class IngredientsSerializer(serializers.ModelSerializer):
 class RecipeIngredientsReadSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name')
-    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit',
+        )
 
     class Meta:
         model = RecipeIngredient
@@ -139,7 +133,9 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         if not ingredients:
-            raise serializers.ValidationError("Ingredients field cannot be empty.")
+            raise serializers.ValidationError(
+                "Ingredients field cannot be empty.",
+                )
         tags = validated_data.pop('tags')
         author = self.context.get('request').user
         recipes = Recipes.objects.create(author=author, **validated_data)
@@ -165,7 +161,10 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
         instance.image = validated_data.get('image', instance.image)
-        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        instance.cooking_time = validated_data.get(
+            'cooking_time',
+            instance.cooking_time,
+            )
         instance.ingredients.clear()
         for ingredient_data in ingredients_data:
             ingredient = ingredient_data['id']
@@ -192,7 +191,10 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
 class RecipesReadSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
-    ingredients = RecipeIngredientsReadSerializer(source='recipe_ingredient', many=True)
+    ingredients = RecipeIngredientsReadSerializer(
+        source='recipe_ingredient',
+        many=True
+        )
     is_favorited = serializers.SerializerMethodField(read_only=True)
     image = Base64ImageField(required=False, allow_null=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
@@ -234,7 +236,11 @@ class RecipesReadSerializer(serializers.ModelSerializer):
 class RecipesFavoriteShortSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='recipe.id')
     name = serializers.CharField(source='recipe.name')
-    image = Base64ImageField(source='recipe.image', required=False, allow_null=True)
+    image = Base64ImageField(
+        source='recipe.image',
+        required=False,
+        allow_null=True
+        )
     cooking_time = serializers.IntegerField(source='recipe.cooking_time')
 
     class Meta:
@@ -250,7 +256,11 @@ class RecipesFavoriteShortSerializer(serializers.ModelSerializer):
 class ShoppingCartSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='recipe.id')
     name = serializers.CharField(source='recipe.name')
-    image = Base64ImageField(source='recipe.image', required=False, allow_null=True)
+    image = Base64ImageField(
+        source='recipe.image',
+        required=False,
+        allow_null=True,
+        )
     cooking_time = serializers.IntegerField(source='recipe.cooking_time')
 
     class Meta:

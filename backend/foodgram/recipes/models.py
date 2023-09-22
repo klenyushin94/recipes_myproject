@@ -1,11 +1,16 @@
 from django.db import models
+
 from users.models import User
 
 
 class Ingredients(models.Model):
     """Модель ингредиента."""
     name = models.CharField('Название ингредиента', max_length=50)
-    measurement_unit = models.CharField('Единицы измерения', max_length=20, unique=False)
+    measurement_unit = models.CharField(
+        'Единицы измерения',
+        max_length=20,
+        unique=False
+        )
 
     class Meta:
         verbose_name = 'Ингредиент'

@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+
 import django
 from django.utils.translation import gettext
+
 django.utils.translation.ugettext = gettext
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
