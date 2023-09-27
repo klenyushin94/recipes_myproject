@@ -2,6 +2,7 @@ import csv
 from django.core.management.base import BaseCommand
 from backend.foodgram.recipes.models import Ingredients
 
+
 class Command(BaseCommand):
     help = 'Import ingredients from CSV file'
 
@@ -21,4 +22,6 @@ class Command(BaseCommand):
                 ingredient = Ingredients(name=name, unit=unit)
                 ingredient.save()
 
-        self.stdout.write(self.style.SUCCESS('Ingredients imported successfully'))
+        self.stdout.write(
+            self.style.SUCCESS('Ingredients imported successfully')
+        )
