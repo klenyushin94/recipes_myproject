@@ -1,5 +1,4 @@
 from django.db import models
-
 from users.models import User
 
 
@@ -142,7 +141,7 @@ class ShoppingCartRecipe(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.recipe.name}"
-    
+
 
 class Subscriptions(models.Model):
     author = models.ForeignKey(
