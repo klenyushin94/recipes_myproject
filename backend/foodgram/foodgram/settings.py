@@ -30,7 +30,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'pzyz25&dk=$dfwz_e&z(qd^qkik)q05^6!bmvuknt$mor90=mq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://klenyushin94.ddns.net/', 'http://localhost*', 'http://backend*']
