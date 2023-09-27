@@ -1,6 +1,6 @@
 # Файл main.yml
 # Имя workflow
-name: Main Taski Workflow
+name: Master Taski Workflow
 # Перечень событий-триггеров, при которых должен запускаться workflow
 on:
   # Событие push возникает,
@@ -8,7 +8,7 @@ on:
   push:
     # Отслеживаем изменения только в ветке main
     branches:
-      - main
+      - master
 # Перечень задач
 jobs:
   # Единственная задача — склонировать код 
