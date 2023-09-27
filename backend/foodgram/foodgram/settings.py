@@ -33,7 +33,7 @@ SECRET_KEY = 'pzyz25&dk=$dfwz_e&z(qd^qkik)q05^6!bmvuknt$mor90=mq'
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://klenyushin94.ddns.net/']
+CSRF_TRUSTED_ORIGINS = ['https://klenyushin94.ddns.net/', 'http://localhost*', 'http://backend*']
 
 
 # Application definition
