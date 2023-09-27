@@ -10,7 +10,7 @@ class Ingredients(models.Model):
         'Единицы измерения',
         max_length=20,
         unique=False
-        )
+    )
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -50,13 +50,13 @@ class Recipes(models.Model):
         upload_to='recipes/images/',
         null=True,
         default=None
-        )
+    )
     text = models.TextField('Текст описания блюда')
     ingredients = models.ManyToManyField(
         Ingredients,
         through='RecipeIngredient',
         verbose_name='Ингредиенты',
-        )
+    )
     tags = models.ManyToManyField(
         Tags,
         verbose_name='Теги',
@@ -105,13 +105,13 @@ class FavoriteRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='favorite_recipes',
         verbose_name='Пользователь'
-        )
+    )
     recipe = models.ForeignKey(
         Recipes,
         on_delete=models.CASCADE,
         related_name='favorite_recipes',
         verbose_name='Рецепт'
-        )
+    )
 
     class Meta:
         verbose_name = 'избранный рецепт'
@@ -128,13 +128,13 @@ class ShoppingCartRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='shopping_cart_recipes',
         verbose_name='Пользователь'
-        )
+    )
     recipe = models.ForeignKey(
         Recipes,
         on_delete=models.CASCADE,
         related_name='added_to_cart_by',
         verbose_name='Рецепт'
-        )
+    )
 
     class Meta:
         verbose_name = 'продукт'

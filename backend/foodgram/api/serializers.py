@@ -78,7 +78,7 @@ class RecipeIngredientsReadSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='ingredient.name')
     measurement_unit = serializers.CharField(
         source='ingredient.measurement_unit',
-        )
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -135,7 +135,7 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
         if not ingredients:
             raise serializers.ValidationError(
                 "Ingredients field cannot be empty.",
-                )
+            )
         tags = validated_data.pop('tags')
         author = self.context.get('request').user
         recipes = Recipes.objects.create(author=author, **validated_data)
@@ -164,7 +164,7 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
         instance.cooking_time = validated_data.get(
             'cooking_time',
             instance.cooking_time,
-            )
+        )
         instance.ingredients.clear()
         for ingredient_data in ingredients_data:
             ingredient = ingredient_data['id']
@@ -173,7 +173,7 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
                 recipe=instance,
                 ingredient=ingredient,
                 amount=amount
-                )
+            )
         instance.tags.clear()
         for tag_data in tags_data:
             tag = tag_data
@@ -194,7 +194,7 @@ class RecipesReadSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientsReadSerializer(
         source='recipe_ingredient',
         many=True
-        )
+    )
     is_favorited = serializers.SerializerMethodField(read_only=True)
     image = Base64ImageField(required=False, allow_null=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
@@ -220,7 +220,7 @@ class RecipesReadSerializer(serializers.ModelSerializer):
         is_favorited = FavoriteRecipe.objects.filter(
             user=user,
             recipe=recipe
-            ).exists()
+        ).exists()
         return is_favorited
 
     def get_is_in_shopping_cart(self, obj):
@@ -229,7 +229,7 @@ class RecipesReadSerializer(serializers.ModelSerializer):
         is_in_shopping_cart = ShoppingCartRecipe.objects.filter(
             user=user,
             recipe=recipe
-            ).exists()
+        ).exists()
         return is_in_shopping_cart
 
 
@@ -240,7 +240,7 @@ class RecipesFavoriteShortSerializer(serializers.ModelSerializer):
         source='recipe.image',
         required=False,
         allow_null=True
-        )
+    )
     cooking_time = serializers.IntegerField(source='recipe.cooking_time')
 
     class Meta:
@@ -260,7 +260,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         source='recipe.image',
         required=False,
         allow_null=True,
-        )
+    )
     cooking_time = serializers.IntegerField(source='recipe.cooking_time')
 
     class Meta:
@@ -314,7 +314,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         is_subscribed = Subscriptions.objects.filter(
             user=user,
             author=author
-            ).exists()
+        ).exists()
         return is_subscribed
 
     def get_recipes(self, obj):

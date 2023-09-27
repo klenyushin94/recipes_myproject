@@ -13,7 +13,6 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
                             Recipes, ShoppingCartRecipe, Subscriptions, Tags,
                             User)
@@ -101,7 +100,7 @@ class UserViewSet(UserViewSet):
             for subscription in serializer.data:
                 subscription['recipes'] = (
                     subscription['recipes'][:int(recipes_limit)]
-                    )
+                )
         return paginator.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['post'])
@@ -115,13 +114,13 @@ class UserViewSet(UserViewSet):
             return Response(
                 {'error': 'Invalid current password.'},
                 status=status.HTTP_400_BAD_REQUEST,
-                )
+            )
         user.set_password(new_password)
         user.save()
         return Response(
             {'message': 'Password successfully changed.'},
             status=status.HTTP_200_OK
-            )
+        )
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
@@ -184,12 +183,12 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 return Response(
                     {'message': 'Рецепт уже добавлен в избранное'},
                     status=status.HTTP_400_BAD_REQUEST
-                    )
+                )
             else:
                 favorite = FavoriteRecipe.objects.create(
                     user=request.user,
                     recipe=recipe,
-                    )
+                )
                 serializer = RecipesFavoriteShortSerializer(favorite)
                 return Response(serializer.data)
         elif request.method == 'DELETE':
@@ -197,7 +196,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             favorites = FavoriteRecipe.objects.filter(
                 user=request.user,
                 recipe=recipe,
-                )
+            )
             if favorites.exists():
                 favorites.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -205,7 +204,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 return Response(
                     {'message': 'Рецепт не найден в избранном'},
                     status=status.HTTP_404_NOT_FOUND
-                    )
+                )
 
     @action(detail=True, methods=['post', 'delete'])
     def shopping_cart(self, request, pk=None):
@@ -219,12 +218,12 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 return Response(
                     {'message': 'Рецепт уже добавлен в список продуктов'},
                     status=status.HTTP_400_BAD_REQUEST
-                    )
+                )
             else:
                 cart = ShoppingCartRecipe.objects.create(
                     user=request.user,
                     recipe=recipe,
-                    )
+                )
                 serializer = ShoppingCartSerializer(cart)
                 return Response(serializer.data)
         elif request.method == 'DELETE':
@@ -232,7 +231,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             cart = ShoppingCartRecipe.objects.filter(
                 user=request.user,
                 recipe=recipe,
-                )
+            )
             if cart.exists():
                 cart.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -240,7 +239,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 return Response(
                     {'message': 'Рецепт не найден списке продуктов'},
                     status=status.HTTP_404_NOT_FOUND
-                    )
+                )
 
     @action(detail=False, methods=['get'])
     def download_shopping_cart(self, request):
@@ -250,7 +249,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         for cart_item in cart_items:
             recipe_ingredients = RecipeIngredient.objects.filter(
                 recipe=cart_item.recipe,
-                )
+            )
             for recipe_ingredient in recipe_ingredients:
                 ingredient = recipe_ingredient.ingredient
                 ingredients_totals[ingredient.name] += recipe_ingredient.amount
@@ -260,7 +259,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = (
             'attachment; '
             'filename="shopping_cart.pdf"'
-            )
+        )
         p = canvas.Canvas(response)
         p.setFont("Arial", 12)
         p.setFont("Arial", 14)
