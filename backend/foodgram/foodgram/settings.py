@@ -33,7 +33,7 @@ SECRET_KEY = 'pzyz25&dk=$dfwz_e&z(qd^qkik)q05^6!bmvuknt$mor90=mq'
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8001']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1']
 
 
 # Application definition
