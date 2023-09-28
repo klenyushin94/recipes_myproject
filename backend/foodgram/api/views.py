@@ -7,15 +7,16 @@ from django.utils.translation import ugettext as _
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from djoser.views import UserViewSet
+from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
+                            Recipes, ShoppingCartRecipe, Subscriptions, Tags,
+                            User)
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.pdfgen import canvas
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
-                            Recipes, ShoppingCartRecipe, Subscriptions, Tags,
-                            User)
+
 
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientsSerializer, RecipesCreateUpdateSerializer,
