@@ -1,1 +1,1 @@
-# praktikum_new_diploma
+# praktikum_new_diplom
