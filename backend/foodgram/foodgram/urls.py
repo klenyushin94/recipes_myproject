@@ -6,7 +6,6 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
-
 router1 = routers.DefaultRouter()
 router1.register(r'tags', TagsViewSet, basename='tags')
 router1.register(r'recipes', RecipesViewSet, basename='recipes')

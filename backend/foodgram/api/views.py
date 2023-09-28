@@ -17,7 +17,6 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientsSerializer, RecipesCreateUpdateSerializer,
                           RecipesFavoriteShortSerializer,
