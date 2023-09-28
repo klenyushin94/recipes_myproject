@@ -26,7 +26,7 @@ from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
 
 
 class IngredientFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='startswith')
+    name = filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Ingredients
@@ -175,10 +175,10 @@ class RecipesViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [permissions.AllowAny]
-        return super().get_permissions()
+    # def get_permissions(self):
+    #     if self.request.method == 'GET':
+    #         return [permissions.AllowAny]
+    #     return super().get_permissions()
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
