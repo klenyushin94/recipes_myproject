@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django_filters import rest_framework as filters
+from django_filters.rest_framework import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
@@ -23,6 +24,14 @@ from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           RecipesReadSerializer, SetPasswordSerializer,
                           ShoppingCartSerializer, SubscriptionsSerializer,
                           TagsSerializer)
+
+
+class IngredientFilter(FilterSet):
+    name = filters.CharFilter(lookup_expr='startswith')
+
+    class Meta:
+        model = Ingredients
+        fields = ['name']
 
 
 class RecipeFilter(filters.FilterSet):
@@ -127,6 +136,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     pagination_class = None
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
+    filterset_class = IngredientFilter
 
     def create(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -165,6 +175,11 @@ class RecipesViewSet(viewsets.ModelViewSet):
     pagination_class = UserPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny]
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
