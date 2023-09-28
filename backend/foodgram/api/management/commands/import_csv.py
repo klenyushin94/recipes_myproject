@@ -2,7 +2,7 @@ import csv
 
 from django.core.management.base import BaseCommand
 
-from backend.foodgram.recipes.models import Ingredients
+from recipes.models import Ingredients
 
 
 class Command(BaseCommand):
@@ -21,7 +21,7 @@ class Command(BaseCommand):
             for row in reader:
                 name = row[0]
                 unit = row[1]
-                ingredient = Ingredients(name=name, unit=unit)
+                ingredient = Ingredients(name=name, measurement_unit=unit)
                 ingredient.save()
 
         self.stdout.write(
