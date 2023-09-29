@@ -1,6 +1,6 @@
+import codecs
 import re
 from collections import defaultdict
-from urllib.parse import quote
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -27,13 +27,7 @@ from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
 
 
 class IngredientFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='icontains')
-
-    def filter_queryset(self, queryset):
-        if 'name' in self.data:
-            self.data = self.data.copy()
-            self.data['name'] = quote(self.data['name'])
-        return super().filter_queryset(queryset)
+    name = filters.CharFilter(lookup_expr='icontains', field_name='name')
 
     class Meta:
         model = Ingredients
