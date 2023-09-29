@@ -1,5 +1,6 @@
 import csv
 
+from django.db import connection
 from django.core.management.base import BaseCommand
 from recipes.models import Ingredients
 
@@ -17,6 +18,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         csv_file = options['csv_file']
         Ingredients.objects.all().delete()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "ALTER SEQUENCE recipes_ingredients_id_seq RESTART WITH 1"
+            )
         with open(csv_file, 'r') as file:
             reader = csv.reader(file)
             next(reader)
