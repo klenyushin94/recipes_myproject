@@ -134,8 +134,8 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     pagination_class = None
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ('^name',)
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ('^name',)
 
     def create(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
