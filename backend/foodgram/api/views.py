@@ -16,6 +16,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from urllib.parse import quote
 
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientsSerializer, RecipesCreateUpdateSerializer,
@@ -27,6 +28,12 @@ from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
 
 class IngredientFilter(FilterSet):
     name = filters.CharFilter(lookup_expr='icontains')
+
+    def filter_queryset(self, queryset):
+        if 'name' in self.data:
+            self.data = self.data.copy()
+            self.data['name'] = quote(self.data['name'])
+        return super().filter_queryset(queryset)
 
     class Meta:
         model = Ingredients

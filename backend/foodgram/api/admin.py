@@ -15,6 +15,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Ingredients)
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'name',
         'measurement_unit',
     )
