@@ -17,7 +17,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         csv_file = options['csv_file']
         Ingredients.objects.all().delete()
-        Ingredients.objects.reset_sequence('id')
         with open(csv_file, 'r') as file:
             reader = csv.reader(file)
             next(reader)
