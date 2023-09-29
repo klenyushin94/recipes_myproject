@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django_filters import rest_framework as filters
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from djoser.views import UserViewSet
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
                             Recipes, ShoppingCartRecipe, Subscriptions, Tags,
@@ -23,6 +23,14 @@ from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           RecipesReadSerializer, SetPasswordSerializer,
                           ShoppingCartSerializer, SubscriptionsSerializer,
                           TagsSerializer)
+
+
+# class IngredientFilter(FilterSet):
+#     name = filters.CharFilter(lookup_expr='icontains', field_name='name')
+
+#     class Meta:
+#         model = Ingredients
+#         fields = ['name']
 
 
 class RecipeFilter(filters.FilterSet):
@@ -128,7 +136,7 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ('^name', )
+    search_fields = ['name']
 
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
