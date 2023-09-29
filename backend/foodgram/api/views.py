@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from urllib.parse import quote
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -16,7 +17,6 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from urllib.parse import quote
 
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientsSerializer, RecipesCreateUpdateSerializer,
