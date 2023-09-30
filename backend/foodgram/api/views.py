@@ -137,7 +137,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientsSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
-    search_fields = (' ^name', )
+    search_fields = ('^name', )
 
     def create(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
