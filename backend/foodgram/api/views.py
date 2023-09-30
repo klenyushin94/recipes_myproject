@@ -4,53 +4,25 @@ from collections import defaultdict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
-from django_filters import rest_framework as filters
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
                             Recipes, ShoppingCartRecipe, Subscriptions, Tags,
                             User)
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.pdfgen import canvas
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from .filters import IngredientFilter, RecipeFilter
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientsSerializer, RecipesCreateUpdateSerializer,
                           RecipesFavoriteShortSerializer,
                           RecipesReadSerializer, SetPasswordSerializer,
                           ShoppingCartSerializer, SubscriptionsSerializer,
                           TagsSerializer)
-
-
-class IngredientFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='startwith')
-
-    class Meta:
-        model = Ingredients
-        fields = ['name']
-
-
-class RecipeFilter(filters.FilterSet):
-    tags = filters.ModelMultipleChoiceFilter(
-        field_name='tags__slug',
-        to_field_name='slug',
-        queryset=Tags.objects.all(),
-    )
-    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
-    author = filters.NumberFilter(field_name='author__id')
-
-    def filter_is_favorited(self, queryset, name, value):
-        user = self.request.user
-        if value and not user.is_anonymous:
-            return queryset.filter(favorite_recipes__user=user)
-        return queryset
-
-    class Meta:
-        model = Recipes
-        fields = ['author', 'tags', 'is_favorited']
 
 
 class UserPagination(PageNumberPagination):
