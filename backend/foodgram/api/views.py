@@ -12,7 +12,7 @@ from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
                             User)
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.pdfgen import canvas
-from rest_framework import permissions, status, viewsets
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -26,7 +26,7 @@ from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
 
 
 class IngredientFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='icontains', field_name='name')
+    name = filters.CharFilter(lookup_expr='startwith')
 
     class Meta:
         model = Ingredients
@@ -135,7 +135,8 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     pagination_class = None
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
-    filterset_class = IngredientFilter
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
 
     def create(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
