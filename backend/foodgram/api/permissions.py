@@ -8,3 +8,10 @@ class CustomReadOnly(permissions.BasePermission):
         return (
             request.method in permissions.SAFE_METHODS
         )
+
+
+class IsUserReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in ['GET']:
+            return True
+        return False

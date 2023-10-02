@@ -17,6 +17,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
+from .permissions import IsUserReadOnly
 from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
                           IngredientsSerializer, RecipesCreateUpdateSerializer,
                           RecipesFavoriteShortSerializer,
@@ -39,6 +40,7 @@ class SubscriptionsPagination(PageNumberPagination):
 class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     pagination_class = UserPagination
+    permission_classes = [IsUserReadOnly]
 
     def create(self, request, *args, **kwargs):
         username = request.data.get('username')
