@@ -39,6 +39,8 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
+        if user.is_anonymous or not user.id:
+            return False
         author = obj
         is_subscribed = Subscriptions.objects.filter(
             user=user,
@@ -215,6 +217,8 @@ class RecipesReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
+        if user.is_anonymous or not user.id:
+            return False
         recipe = obj.id
         is_favorited = FavoriteRecipe.objects.filter(
             user=user,
@@ -224,12 +228,32 @@ class RecipesReadSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
+        if user.is_anonymous or not user.id:
+            return False
         recipe = obj.id
         is_in_shopping_cart = ShoppingCartRecipe.objects.filter(
             user=user,
             recipe=recipe
         ).exists()
         return is_in_shopping_cart
+    
+    # def get_is_favorited(self, obj):
+    #     user = self.context['request'].user
+    #     recipe = obj.id
+    #     is_favorited = FavoriteRecipe.objects.filter(
+    #         user=user,
+    #         recipe=recipe
+    #     ).exists()
+    #     return is_favorited
+
+    # def get_is_in_shopping_cart(self, obj):
+    #     user = self.context['request'].user
+    #     recipe = obj.id
+    #     is_in_shopping_cart = ShoppingCartRecipe.objects.filter(
+    #         user=user,
+    #         recipe=recipe
+    #     ).exists()
+    #     return is_in_shopping_cart
 
 
 class RecipesFavoriteShortSerializer(serializers.ModelSerializer):

@@ -7,6 +7,7 @@ from users.models import User
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'username',
         'email',
     )
@@ -24,6 +25,7 @@ class IngredientsAdmin(admin.ModelAdmin):
 @admin.register(Tags)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'name',
         'color',
         'slug',
@@ -33,6 +35,7 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Recipes)
 class RecipesAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'name',
         'author',
         'text',
@@ -44,6 +47,7 @@ class RecipesAdmin(admin.ModelAdmin):
 @admin.register(FavoriteRecipe)
 class FavoriteRecipeAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'user',
         'recipe',
     )
@@ -52,6 +56,7 @@ class FavoriteRecipeAdmin(admin.ModelAdmin):
 @admin.register(ShoppingCartRecipe)
 class ShoppingCartRecipeAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'user',
         'recipe',
     )
