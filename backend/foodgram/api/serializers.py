@@ -7,6 +7,8 @@ from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
 from rest_framework import serializers
 from users.models import User
 
+from .validators import RecipesCreateUpdateValidator
+
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
@@ -130,6 +132,7 @@ class RecipesCreateUpdateSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
         model = Recipes
+        validators = [RecipesCreateUpdateValidator()]
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')

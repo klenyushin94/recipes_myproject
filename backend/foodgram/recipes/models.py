@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, RegexValidator
 from users.models import User
 
 
@@ -21,7 +22,14 @@ class Ingredients(models.Model):
 
 class Tags(models.Model):
     name = models.CharField('Название тега', max_length=50)
-    color = models.CharField('Цветовой код', max_length=7)
+    color = models.CharField(
+        'Цветовой код',
+        max_length=7,
+        validators=[
+            RegexValidator(
+                regex='^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$',
+                message='Формат цвета не соответствует HEX')]
+    )
     slug = models.SlugField(unique=True)
 
     class Meta:
@@ -61,7 +69,13 @@ class Recipes(models.Model):
         verbose_name='Теги',
         related_name='recipes',
     )
-    cooking_time = models.IntegerField('Время приготовления блюда')
+    cooking_time = models.IntegerField(
+        'Время приготовления блюда',
+        validators=(
+            MinValueValidator(
+                1,
+                message='Время приготовления должно быть больше 0'),)
+    )
     pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -87,10 +101,15 @@ class RecipeIngredient(models.Model):
     )
     amount = models.IntegerField(
         'Количество',
+        default=1,
+        validators=(
+            MinValueValidator(
+                1,
+                message='Количество ингредиента должно быть больше 0'),)
     )
 
     class Meta:
-        verbose_name = 'граммовку'
+        verbose_name = 'Граммовка ингредиента'
         verbose_name_plural = 'Граммовки ингридиентов'
 
     def __str__(self):
