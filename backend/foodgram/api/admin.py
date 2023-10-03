@@ -1,12 +1,11 @@
 from django.contrib import admin
-from recipes.models import (FavoriteRecipe, Ingredients, Recipes,
-                            ShoppingCartRecipe, Tags, RecipeIngredient)
+from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
+                            Recipes, ShoppingCartRecipe, Tags,)
 from users.models import User
 
 
 class RecipeIngredientAdmin(admin.StackedInline):
     model = RecipeIngredient
-    # autocomplete_fields = ('ingredient',)
     min_num = 1
 
 
