@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
                             Recipes, ShoppingCartRecipe, Tags)
 from users.models import User
@@ -50,6 +51,7 @@ class RecipesAdmin(admin.ModelAdmin):
         'text',
         'cooking_time',
         'pub_date',
+        'favorite_count',
     )
     search_fields = (
         'name',
@@ -61,15 +63,15 @@ class RecipesAdmin(admin.ModelAdmin):
     list_filter = ('tags', 'author', 'name')
     inlines = (RecipeIngredientAdmin,)
 
-    # @admin.display(description='Теги')
-    # def get_tags(self, obj):
-    #     return ', '.join([tag.name for tag in obj.tags.all()])
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(favorite_count=Count('favorite_recipes'))
+        return queryset
 
-    # @admin.display(description='Ингредиенты')
-    # def get_ingredients(self, obj):
-    #     return ', '.join(
-    #         [ingredient.name for ingredient in obj.ingredients.all()]
-    #     )
+    def favorite_count(self, obj):
+        return obj.favorite_count
+
+    favorite_count.short_description = 'Добавления в избранное'
 
 
 @admin.register(FavoriteRecipe)
