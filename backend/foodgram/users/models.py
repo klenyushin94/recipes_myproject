@@ -1,5 +1,14 @@
+import re
+
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
+
+
+def validate_username(value):
+    pattern = r'^[a-zA-Z0-9]+$'
+    if not re.match(pattern, value):
+        raise ValidationError('Имя пользователя может содержать только буквы и цифры.')
 
 
 class User(AbstractUser):
@@ -17,6 +26,7 @@ class User(AbstractUser):
         unique=True,
         blank=False,
         max_length=150,
+        validators=[validate_username],
         error_messages={
             'unique': 'Пользователь с таким username уже создан!',
         },

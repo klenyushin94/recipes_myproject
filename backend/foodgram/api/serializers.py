@@ -1,5 +1,7 @@
 import base64
+import re
 
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
@@ -8,6 +10,13 @@ from rest_framework import serializers
 from users.models import User
 
 from .validators import RecipesCreateUpdateValidator
+
+
+def validate_username(value):
+    if re.search(r'[^\w\s]', value):
+        raise ValidationError(
+            "Имя пользователя не может содержать специальные символы"
+        )
 
 
 class Base64ImageField(serializers.ImageField):
@@ -52,6 +61,7 @@ class CustomUserSerializer(UserSerializer):
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
+    username = serializers.CharField(validators=[validate_username])
 
     class Meta:
         fields = (

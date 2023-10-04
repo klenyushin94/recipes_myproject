@@ -42,11 +42,11 @@ class UserViewSet(UserViewSet):
     pagination_class = UserPagination
     permission_classes = [IsUserReadOnly]
 
-    def create(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        if re.match(r'^[A-Za-z0-9]+$', username):
-            return super().create(request, *args, **kwargs)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    # def create(self, request, *args, **kwargs):
+    #     username = request.data.get('username')
+    #     if re.match(r'^[A-Za-z0-9]+$', username):
+    #         return super().create(request, *args, **kwargs)
+    #     return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
