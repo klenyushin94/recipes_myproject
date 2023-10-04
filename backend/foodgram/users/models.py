@@ -8,7 +8,9 @@ from django.db import models
 def validate_username(value):
     pattern = r'^[a-zA-Z0-9]+$'
     if not re.match(pattern, value):
-        raise ValidationError('Имя пользователя может содержать только буквы и цифры.')
+        raise ValidationError(
+            'Имя пользователя может содержать только буквы и цифры.'
+        )
 
 
 class User(AbstractUser):
