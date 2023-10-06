@@ -2,7 +2,8 @@ from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.db.models import constraints
 from users.models import User
-from .constants import NAME_MAX_LENGTH, COLOR_MAX_LENGTH
+
+from .constants import COLOR_MAX_LENGTH, NAME_MAX_LENGTH
 
 
 class Ingredients(models.Model):
