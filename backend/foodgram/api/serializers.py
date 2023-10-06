@@ -250,24 +250,6 @@ class RecipesReadSerializer(serializers.ModelSerializer):
         ).exists()
         return is_in_shopping_cart
 
-    # def get_is_favorited(self, obj):
-    #     user = self.context['request'].user
-    #     recipe = obj.id
-    #     is_favorited = FavoriteRecipe.objects.filter(
-    #         user=user,
-    #         recipe=recipe
-    #     ).exists()
-    #     return is_favorited
-
-    # def get_is_in_shopping_cart(self, obj):
-    #     user = self.context['request'].user
-    #     recipe = obj.id
-    #     is_in_shopping_cart = ShoppingCartRecipe.objects.filter(
-    #         user=user,
-    #         recipe=recipe
-    #     ).exists()
-    #     return is_in_shopping_cart
-
 
 class RecipesFavoriteShortSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='recipe.id')
