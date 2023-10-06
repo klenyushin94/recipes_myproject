@@ -1,14 +1,20 @@
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+from django.db.models import constraints
 from users.models import User
+
+from .constants import COLOR_MAX_LENGTH, NAME_MAX_LENGTH
 
 
 class Ingredients(models.Model):
     """Модель ингредиента."""
-    name = models.CharField('Название ингредиента', max_length=150)
+    name = models.CharField(
+        'Название ингредиента',
+        max_length=NAME_MAX_LENGTH
+    )
     measurement_unit = models.CharField(
         'Единицы измерения',
-        max_length=150,
+        max_length=NAME_MAX_LENGTH,
         unique=False
     )
 
@@ -21,10 +27,13 @@ class Ingredients(models.Model):
 
 
 class Tags(models.Model):
-    name = models.CharField('Название тега', max_length=50)
+    name = models.CharField(
+        'Название тега',
+        max_length=NAME_MAX_LENGTH
+    )
     color = models.CharField(
         'Цветовой код',
-        max_length=7,
+        max_length=COLOR_MAX_LENGTH,
         validators=[
             RegexValidator(
                 regex='^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$',
@@ -50,7 +59,7 @@ class Recipes(models.Model):
     )
     name = models.CharField(
         'Название блюда',
-        max_length=50,
+        max_length=NAME_MAX_LENGTH,
     )
     image = models.ImageField(
         'Картинка',
@@ -134,6 +143,12 @@ class FavoriteRecipe(models.Model):
     class Meta:
         verbose_name = 'избранный рецепт'
         verbose_name_plural = 'Избранное'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_favorite_recipe'
+            )
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.recipe.name}"
@@ -157,6 +172,12 @@ class ShoppingCartRecipe(models.Model):
     class Meta:
         verbose_name = 'продукт'
         verbose_name_plural = 'Список покупок'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_shoppingcart_recipe'
+            )
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.recipe.name}"
@@ -176,3 +197,13 @@ class Subscriptions(models.Model):
 
     class Meta:
         verbose_name_plural = 'Подписка'
+        constraints = [
+            constraints.CheckConstraint(
+                check=~models.Q(author=models.F('user')),
+                name='author_not_equals_user'
+            ),
+            models.UniqueConstraint(
+                fields=['author', 'user'],
+                name='unique_subscription',
+            )
+        ]
