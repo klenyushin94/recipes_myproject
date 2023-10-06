@@ -2,6 +2,9 @@ import os
 
 import django
 from django.utils.translation import gettext
+from dotenv import load_dotenv
+
+load_dotenv()
 
 django.utils.translation.ugettext = gettext
 
