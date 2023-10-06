@@ -3,12 +3,10 @@ import re
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
-from recipes.constants import (EMAIL_MAX_LENGTH, NAME_MAX_LENGTH,
-                               PATTERN_USERNAME)
 
 
 def validate_username(value):
-    pattern = PATTERN_USERNAME
+    pattern = r'^[a-zA-Z0-9]+$'
     if not re.match(pattern, value):
         raise ValidationError(
             'Имя пользователя может содержать только буквы и цифры.'
@@ -22,14 +20,14 @@ class User(AbstractUser):
         help_text='Введите e-mail',
         unique=True,
         blank=False,
-        max_length=EMAIL_MAX_LENGTH,
+        max_length=254,
     )
     username = models.CharField(
         verbose_name='Логин',
         help_text='Введите username',
         unique=True,
         blank=False,
-        max_length=NAME_MAX_LENGTH,
+        max_length=150,
         validators=[validate_username],
         error_messages={
             'unique': 'Пользователь с таким username уже создан!',
@@ -39,13 +37,13 @@ class User(AbstractUser):
         verbose_name='Имя',
         blank=False,
         help_text='Введите имя',
-        max_length=NAME_MAX_LENGTH,
+        max_length=150,
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
         blank=False,
         help_text='Введите фамилию',
-        max_length=NAME_MAX_LENGTH,
+        max_length=150,
     )
     is_subscribed = models.BooleanField(
         verbose_name='Подписка',
@@ -64,7 +62,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ['last_name', 'first_name']
+        ordering = ['email']
 
     def __str__(self):
         return f'{self.username} ({self.email})'
