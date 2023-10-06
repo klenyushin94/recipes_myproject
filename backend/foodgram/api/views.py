@@ -26,30 +26,30 @@ from .serializers import (CustomUserCreateSerializer, CustomUserSerializer,
 
 
 def generate_shopping_cart_pdf(ingredients_totals):
-        MyFontObject = ttfonts.TTFont('Arial', './media/arial.ttf')
-        pdfmetrics.registerFont(MyFontObject)
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = (
-            'attachment; ',
-            'filename="shopping_cart.pdf"'
-        )
-        p = canvas.Canvas(response)
-        p.setFont("Arial", 12)
-        p.setFont("Arial", 14)
-        p.drawString(100, 800, _("Cписок продуктов"))
-        p.setFont("Arial", 12)
-        y = 750
-        for ingredient, amount in ingredients_totals.items():
-            measurement_unit = Ingredients.objects.get(name=ingredient)
-            measurement_unit = measurement_unit.measurement_unit
-            p.drawString(
-                100,
-                y,
-                f"{ingredient} ({measurement_unit}) - {amount}")
-            y -= 20
-        p.showPage()
-        p.save()
-        return response
+    MyFontObject = ttfonts.TTFont('Arial', './media/arial.ttf')
+    pdfmetrics.registerFont(MyFontObject)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = (
+        'attachment; ',
+        'filename="shopping_cart.pdf"'
+    )
+    p = canvas.Canvas(response)
+    p.setFont("Arial", 12)
+    p.setFont("Arial", 14)
+    p.drawString(100, 800, _("Cписок продуктов"))
+    p.setFont("Arial", 12)
+    y = 750
+    for ingredient, amount in ingredients_totals.items():
+        measurement_unit = Ingredients.objects.get(name=ingredient)
+        measurement_unit = measurement_unit.measurement_unit
+        p.drawString(
+            100,
+            y,
+            f"{ingredient} ({measurement_unit}) - {amount}")
+        y -= 20
+    p.showPage()
+    p.save()
+    return response
 
 
 class UserPagination(PageNumberPagination):

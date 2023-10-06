@@ -1,13 +1,13 @@
 import re
 
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.db import models
 from recipes.constants import (
     NAME_MAX_LENGTH,
     EMAIL_MAX_LENGTH,
     PATTERN_USERNAME
 )
-from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
-from django.db import models
 
 
 def validate_username(value):
