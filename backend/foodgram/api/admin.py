@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
-                            Recipes, ShoppingCartRecipe, Tags, Subscriptions)
+                            Recipes, ShoppingCartRecipe, Subscriptions, Tags)
 from users.models import User
 
 
