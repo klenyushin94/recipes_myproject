@@ -77,6 +77,7 @@ class Recipes(models.Model):
         Tags,
         verbose_name='Теги',
         related_name='recipes',
+        verbose_name='Теги',
     )
     cooking_time = models.IntegerField(
         'Время приготовления блюда',
@@ -207,3 +208,6 @@ class Subscriptions(models.Model):
                 name='unique_subscription',
             )
         ]
+
+    def __str__(self):
+        return f"{self.user.username} подписан на {self.author.username}"

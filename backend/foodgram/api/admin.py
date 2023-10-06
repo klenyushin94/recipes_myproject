@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
 from recipes.models import (FavoriteRecipe, Ingredients, RecipeIngredient,
-                            Recipes, ShoppingCartRecipe, Tags)
+                            Recipes, ShoppingCartRecipe, Tags, Subscriptions)
 from users.models import User
 
 
@@ -92,3 +92,13 @@ class ShoppingCartRecipeAdmin(admin.ModelAdmin):
         'recipe',
     )
     search_fields = ('user__email', 'recipe__name')
+
+
+@admin.register(Subscriptions)
+class SubscriptionsAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'author',
+    )
+    search_fields = ('user__last_name', 'user__first_name')
