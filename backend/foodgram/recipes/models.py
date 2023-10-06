@@ -77,7 +77,6 @@ class Recipes(models.Model):
         Tags,
         verbose_name='Теги',
         related_name='recipes',
-        verbose_name='Теги',
     )
     cooking_time = models.IntegerField(
         'Время приготовления блюда',
